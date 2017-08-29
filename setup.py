@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='CAM2RequestsCLI',
     version='0.1-SNAPSHOT',
-    packages=['click_cli'],
+    packages=['CAM2RequestsCLI'],
     include_package_data=True,
     install_requires=[
         'click',
@@ -11,6 +11,6 @@ setup(
     ],
 	entry_points='''
         [console_scripts]
-        cam2-requests-cli=click_cli:cli
+        cam2-requests-cli=CAM2RequestsCLI:cli
     ''',
 ) 
