@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='CAM2RequestsCLI',
-    version='0.1-SNAPSHOT',
+    version='1.0-a0',
     packages=['CAM2RequestsCLI'],
     include_package_data=True,
     install_requires=[

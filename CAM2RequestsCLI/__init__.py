@@ -74,7 +74,7 @@ def logout():
 	with open(cache_file, 'w') as f:
 		config.write(f)
 
-@cli.command(help='Submit new job')
+@cli.command(help='Send a new submission')
 @click.argument('submission_id')
 @click.argument('request_file', default='request.json')
 @click.argument('analyzer_file', default='analyzer.py')
@@ -117,6 +117,28 @@ def download(submission_id, file_name):
 def delete(submission_id):
 	from commands.delete import delete as delete_command
 	click.echo(delete_command(host, port, username, password, submission_id))
+
+@cli.command(help='Get all submissions')
+@requires_config
+@requires_auth
+def submissions():
+	from commands.submissions import submissions as submissions_command
+	click.echo(submissions_command(host, port, username, password))
+
+@cli.command(help='Register as a new user')
+@click.argument('username')
+@click.argument('password')
+@requires_config
+def register(username, password):
+	from commands.register import register as register_command
+	click.echo(register_command(host, port, username, password))
+
+@cli.command(help='Unregister from the system (deletes all of your data!)')
+@requires_config
+@requires_auth
+def unregister():
+	from commands.unregister import unregister as unregister_command
+	click.echo(unregister_command(host, port, username, password))
 
 if __name__ == '__main__':
 	cli()
