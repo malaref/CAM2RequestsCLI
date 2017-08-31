@@ -1,95 +1,67 @@
-import ConfigParser, os, click
-from functools import wraps
+"""The root module of the CLI
 
-config = ConfigParser.SafeConfigParser()
+This is the module that contains the CLI
+entry point. Also, it all the commands the
+user can invoke.
 
-# Configuration
-cache_file = os.path.join(os.path.expanduser('~'), '.CAM2RequestsCLI')
-if os.path.exists(cache_file):
-	config.read(cache_file)
-else:
-	config.add_section('url')
-	config.add_section('auth')
-	config.set('url', 'host', '')
-	config.set('url', 'port', '')
-	config.set('auth', 'username', '')
-	config.set('auth', 'password', '')
-	with open(cache_file, 'w') as f:
-		config.write(f)
+"""
+
+from configuration import config, set_url, set_user, clear_user
+
 host = config.get('url', 'host')
 port = config.get('url', 'port')
 username = config.get('auth', 'username')
 password = config.get('auth', 'password')
 
-# Check config
-def requires_config(f):
-	@wraps(f)
-	def decorated(*args, **kwargs):
-		if host != '' and port != '':
-			return f(*args, **kwargs)
-		else:
-			raise click.UsageError('CAM2DistributedBackend URL is not set. Use the `url` command to set it')
-	return decorated
-
-# Check auth
-def requires_auth(f):
-	@wraps(f)
-	def decorated(*args, **kwargs):
-		if username != '' and password != '':
-			return f(*args, **kwargs)
-		else:
-			raise click.UsageError('User is not logged in. Use the `login` command to log in')
-	return decorated
+import click
+from checkers import requires_config, requires_auth
 
 @click.group()
 @click.version_option(prog_name='CAM2RequestsCLI')
 def cli():
+	'''The entry point of the CLI and the parent group of all the commands'''
 	pass
 
-@cli.command(help='Set CAM2DistributedBackend URL')
+@cli.command(help='Set CAM2RESTfulAPI URL')
 @click.argument('host')
 @click.argument('port')
 def url(host, port):
-	config.set('url', 'host', host)
-	config.set('url', 'port', port)
-	with open(cache_file, 'w') as f:
-		config.write(f)
+	'''This command enables the user to configure the URL of the CAM2RESTfulAPI'''
+	set_url(host, port)
 
 @cli.command(help='Set user credentials')
 @click.argument('username')
 @click.argument('password')
 @requires_config
 def login(username, password):
-	config.set('auth', 'username', username)
-	config.set('auth', 'password', password)
-	with open(cache_file, 'w') as f:
-		config.write(f)
+	'''This command enables the user to enter his/her credentials'''
+	set_user(username, password)
 
 @cli.command(help='Clear user credentials')
 @requires_config
 @requires_auth
 def logout():
-	config.set('auth', 'username', '')
-	config.set('auth', 'password', '')
-	with open(cache_file, 'w') as f:
-		config.write(f)
+	'''This command enables the user to clear his/her credentials'''
+	clear_user()
 
-@cli.command(help='Send a new submission')
+@cli.command(help='Make a new submission')
 @click.argument('submission_id')
-@click.argument('request_file', default='request.json')
-@click.argument('analyzer_file', default='analyzer.py')
+@click.argument('request_file')
+@click.argument('analyzer_file')
 @requires_config
 @requires_auth
 def submit(submission_id, request_file, analyzer_file):
+	'''This command enables the user to make a new submission'''
 	from commands.submit import submit as submit_command
 	click.echo(submit_command(host, port, username, password, submission_id, request_file, analyzer_file))
 
-@cli.command(help='Query the status of a submission')
+@cli.command(help='Query about the status of a submission')
 @click.argument('submission_id')
 @click.argument('specific_attribute', default=None, required=False)
 @requires_config
 @requires_auth
 def status(submission_id, specific_attribute):
+	'''This command enables the user to query about the status of a certain submission'''
 	from commands.status import status as status_command
 	click.echo(status_command(host, port, username, password, submission_id, specific_attribute))
 
@@ -98,6 +70,7 @@ def status(submission_id, specific_attribute):
 @requires_config
 @requires_auth
 def terminate(submission_id):
+	'''This command enables the user to terminate a running submission'''
 	from commands.terminate import terminate as terminate_command
 	click.echo(terminate_command(host, port, username, password, submission_id))
 
@@ -107,6 +80,7 @@ def terminate(submission_id):
 @requires_config
 @requires_auth
 def download(submission_id, file_name):
+	'''This command enables the user to download the result of a completed/terminated submission'''
 	from commands.download import download as download_command
 	click.echo(download_command(host, port, username, password, submission_id, file_name))
 
@@ -115,6 +89,7 @@ def download(submission_id, file_name):
 @requires_config
 @requires_auth
 def delete(submission_id):
+	'''This command enables the user to delete the results of a completed/terminated submission'''
 	from commands.delete import delete as delete_command
 	click.echo(delete_command(host, port, username, password, submission_id))
 
@@ -122,6 +97,7 @@ def delete(submission_id):
 @requires_config
 @requires_auth
 def submissions():
+	'''This command enables the user to query about all the submissions he/she has'''
 	from commands.submissions import submissions as submissions_command
 	click.echo(submissions_command(host, port, username, password))
 
@@ -130,15 +106,16 @@ def submissions():
 @click.argument('password')
 @requires_config
 def register(username, password):
+	'''This command enables a new user to register for a new account'''
 	from commands.register import register as register_command
 	click.echo(register_command(host, port, username, password))
+	clear_user()
 
 @cli.command(help='Unregister from the system (deletes all of your data!)')
 @requires_config
 @requires_auth
 def unregister():
+	'''This command enables the user to unregister from the system'''
 	from commands.unregister import unregister as unregister_command
 	click.echo(unregister_command(host, port, username, password))
-
-if __name__ == '__main__':
-	cli()
+	clear_user()
