@@ -52,7 +52,7 @@ def logout():
 @requires_auth
 def submit(submission_id, request_file, analyzer_file):
 	'''This command enables the user to make a new submission'''
-	from commands.submit import submit as submit_command
+	from commands import submit as submit_command
 	click.echo(submit_command(host, port, username, password, submission_id, request_file, analyzer_file))
 
 @cli.command(help='Query about the status of a submission')
@@ -62,7 +62,7 @@ def submit(submission_id, request_file, analyzer_file):
 @requires_auth
 def status(submission_id, specific_attribute):
 	'''This command enables the user to query about the status of a certain submission'''
-	from commands.status import status as status_command
+	from commands import status as status_command
 	click.echo(status_command(host, port, username, password, submission_id, specific_attribute))
 
 @cli.command(help='Terminate a running submission')
@@ -71,7 +71,7 @@ def status(submission_id, specific_attribute):
 @requires_auth
 def terminate(submission_id):
 	'''This command enables the user to terminate a running submission'''
-	from commands.terminate import terminate as terminate_command
+	from commands import terminate as terminate_command
 	click.echo(terminate_command(host, port, username, password, submission_id))
 
 @cli.command(help='Download the results of a completed/terminated submission')
@@ -81,7 +81,7 @@ def terminate(submission_id):
 @requires_auth
 def download(submission_id, file_name):
 	'''This command enables the user to download the result of a completed/terminated submission'''
-	from commands.download import download as download_command
+	from commands import download as download_command
 	click.echo(download_command(host, port, username, password, submission_id, file_name))
 
 @cli.command(help='Delete the results of a completed/terminated submission')
@@ -90,7 +90,7 @@ def download(submission_id, file_name):
 @requires_auth
 def delete(submission_id):
 	'''This command enables the user to delete the results of a completed/terminated submission'''
-	from commands.delete import delete as delete_command
+	from commands import delete as delete_command
 	click.echo(delete_command(host, port, username, password, submission_id))
 
 @cli.command(help='Get all submissions')
@@ -98,7 +98,7 @@ def delete(submission_id):
 @requires_auth
 def submissions():
 	'''This command enables the user to query about all the submissions he/she has'''
-	from commands.submissions import submissions as submissions_command
+	from commands import submissions as submissions_command
 	click.echo(submissions_command(host, port, username, password))
 
 @cli.command(help='Register as a new user')
@@ -107,7 +107,7 @@ def submissions():
 @requires_config
 def register(username, password):
 	'''This command enables a new user to register for a new account'''
-	from commands.register import register as register_command
+	from commands import register as register_command
 	click.echo(register_command(host, port, username, password))
 	clear_user()
 
@@ -116,6 +116,6 @@ def register(username, password):
 @requires_auth
 def unregister():
 	'''This command enables the user to unregister from the system'''
-	from commands.unregister import unregister as unregister_command
+	from commands import unregister as unregister_command
 	click.echo(unregister_command(host, port, username, password))
 	clear_user()
