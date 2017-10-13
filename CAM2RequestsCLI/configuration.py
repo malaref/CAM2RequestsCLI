@@ -18,8 +18,6 @@ else:
 	config.add_section('auth')
 	config.set('url', 'host', '')
 	config.set('url', 'port', '')
-	config.set('auth', 'username', '')
-	config.set('auth', 'password', '')
 	with open(cache_file, 'w') as f:
 		config.write(f)
  
@@ -30,16 +28,11 @@ def set_url(host, port):
 	with open(cache_file, 'w') as f:
 		config.write(f)
 
-def set_user(username, password):
+def set_auth(auth):
 	'''Sets the user credentials'''
-	config.set('auth', 'username', username)
-	config.set('auth', 'password', password)
-	with open(cache_file, 'w') as f:
-		config.write(f)
-
-def clear_user():
-	'''Clears the user credentials'''
-	config.set('auth', 'username', '')
-	config.set('auth', 'password', '')
+	config.remove_section('auth')
+	config.add_section('auth')
+	for key in auth.keys():
+		config.set('auth', key, auth[key])
 	with open(cache_file, 'w') as f:
 		config.write(f)
